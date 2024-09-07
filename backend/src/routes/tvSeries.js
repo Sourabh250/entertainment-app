@@ -40,6 +40,22 @@ router.get('/search/:query', validateSearch, handleValidationErrors, async (req,
     }
 });
 
+router.get('/details/:id', validateId, handleValidationErrors, async (req, res) => {
+    try {
+        const tvSeriesId = req.params.id.trim();
+
+        const tvSeries = await TvSeries.findById(tvSeriesId);
+        if (!tvSeries) {
+            return res.status(404).json({ message: 'Tv Series not found' });
+        }
+
+        res.status(200).json(tvSeries);
+    } catch (error) {
+        console.error('Error fetching tv series details:', error);
+        res.status(500).json({ message: 'Internal Server Error', error: error.message });
+    }
+});
+
 router.get('/url/:id', validateId, handleValidationErrors, async (req, res) => {
     try {
         const tvSeriesId = req.params.id.trim();
