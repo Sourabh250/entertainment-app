@@ -21,7 +21,9 @@ const movieSchema = new mongoose.Schema({
     tagline: { type: String, required: true }, // tagline
     status: { type: String, required: true }, // status
     runtime: { type: Number, required: true }, // runtime
-    cast: { type: [String], required: true } // cast name
+    cast: { type: [String], required: true }, // cast name
+    original_country: { type: Array, required: true },
+    original_language: { type: String, required: true } // original_language
 }, {
     timestamps: true,
     id: false

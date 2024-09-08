@@ -11,7 +11,7 @@ const tvSeriesSchema = new mongoose.Schema({
     vote_average: { type: Number, required: true },
     vote_count: { type: Number, required: true },
     adult: { type: Boolean, required: true },
-    backdrop_path: { type: String, required: true },
+    backdrop_path: { type: String, required: false },
     poster_path: { type: String, required: true },
     status: { type: String, required: true }, // status
     tagline: { type: String, required: true }, // tagline
