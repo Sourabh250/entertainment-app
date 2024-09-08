@@ -10,10 +10,9 @@ const movieSchema = new mongoose.Schema({
     popularity: { type: Number, required: true },
     vote_average: { type: Number, required: true },
     vote_count: { type: Number, required: true },
-    adult: { type: Boolean, required: true },
+    adult: { type: Boolean, required: false },
     backdrop_path: { type: String, required: true },
     poster_path: { type: String, required: true },
-    video: { type: Boolean, required: true },
     homepage: { type: String, required: true }, // homepage
     imdb_id: { type: String, required: true }, // imdb_id
     genre_ids: { type: Array, required: true },
@@ -22,7 +21,6 @@ const movieSchema = new mongoose.Schema({
     status: { type: String, required: true }, // status
     runtime: { type: Number, required: true }, // runtime
     cast: { type: [String], required: true }, // cast name
-    original_country: { type: Array, required: true },
     original_language: { type: String, required: true } // original_language
 }, {
     timestamps: true,

@@ -10,8 +10,8 @@ const tvSeriesSchema = new mongoose.Schema({
     popularity: { type: Number, required: true },
     vote_average: { type: Number, required: true },
     vote_count: { type: Number, required: true },
-    adult: { type: Boolean, required: true },
-    backdrop_path: { type: String, required: false },
+    adult: { type: Boolean, required: false },
+    backdrop_path: { type: String, required: true },
     poster_path: { type: String, required: true },
     status: { type: String, required: true }, // status
     tagline: { type: String, required: true }, // tagline
@@ -19,7 +19,6 @@ const tvSeriesSchema = new mongoose.Schema({
     genre_ids: { type: Array, required: true },
     genre: { type: Array, required: true }, // genre name
     cast: { type: [String], required: true }, // cast name
-    original_country: { type: Array, required: true },
     original_language: { type: String, required: true }
 }, {
     timestamps: true,

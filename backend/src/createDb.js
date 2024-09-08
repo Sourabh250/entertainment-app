@@ -4,7 +4,6 @@ dotenv.config();
 const mongoose = require("mongoose");
 const movieModel = require("./models/movie");
 const tvSeriesModel = require("./models/tvSeries");
-const UserModel = require("./models/user");
 
 const apiKey = process.env.TMDB_API_KEY;
 const dbUrl = process.env.DATABASE_URL;
@@ -30,7 +29,7 @@ const fetchAndPopulate = async (url,model) => {
           const detailResponse = await axios.get(detailUrl);
           const details = detailResponse.data;
     
-          return {
+          const itemDetails = {
             ...item,
             status: details.status || 'N/A',
             runtime: details.runtime || 0,
@@ -41,8 +40,21 @@ const fetchAndPopulate = async (url,model) => {
             imdb_id: details.imdb_id || 'N/A',
             last_air_date: details.last_air_date || 'N/A',
           };
+
+          const isValid = Object.keys(model.schema.obj).every((field) => {
+            // If the field is required and the value is missing, mark the item as invalid
+            if (model.schema.obj[field].required && !itemDetails[field]) {
+              console.log(`Skipping item with id ${item.id} due to missing required field: ${field}`);
+              return false;
+            }
+            return true;
+          });
+  
+          return isValid ? itemDetails : null;
+
         }));
-        await model.insertMany(detailedItems);
+        const filteredItems = detailedItems.filter(item => item !== null);
+        await model.insertMany(filteredItems);
         console.log(`Db populated with data to ${model.modelName}`);
     } catch(error) {
         console.error(`Error fetching data or populating the database:`, error);
@@ -50,7 +62,6 @@ const fetchAndPopulate = async (url,model) => {
 };
 
 const refreshAll = async() => {
-    await UserModel.deleteMany({});
     await movieModel.deleteMany({});
     await tvSeriesModel.deleteMany({}); 
     await fetchAndPopulate(movieUrl, movieModel);
