@@ -78,7 +78,14 @@ const fetchAndPopulate = async (url, model) => {
       })
     );
     const filteredItems = detailedItems.filter((item) => item !== null);
-    await model.insertMany(filteredItems);
+    for (const item of filteredItems) {
+      await model.updateOne(
+          { id: item.id }, // Find by unique identifier
+          item, // Update with new data
+          { upsert: true } // Insert if not exists
+      );
+  }
+  
     console.log(`Db populated with data to ${model.modelName}`);
   } catch (error) {
     console.error(`Error fetching data or populating the database:`, error);
