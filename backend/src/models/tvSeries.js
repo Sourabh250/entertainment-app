@@ -18,7 +18,7 @@ const tvSeriesSchema = new mongoose.Schema({
     homepage: { type: String, required: true }, // homepage
     genre_ids: { type: Array, required: true },
     genre: { type: Array, required: true }, // genre name
-    cast: { type: [String], required: true }, // cast name
+    cast: { type: Array, required: true }, // cast name
     original_language: { type: String, required: true }
 }, {
     timestamps: true,

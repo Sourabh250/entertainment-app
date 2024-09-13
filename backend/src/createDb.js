@@ -20,25 +20,6 @@ mongoose
   .then(() => console.log("Connected to MongoDB"))
   .catch((err) => console.error("MongoDB connection error:", err));
 
-const getAllBookmarkedIds = async () => {
-  const users = await userModel
-    .find()
-    .select("movieBookmarks tvSeriesBookmarks");
-  const movieBookmarks = new Set();
-  const tvSeriesBookmarks = new Set();
-
-  users.forEach((user) => {
-    user.movieBookmarks.forEach((item) => movieBookmarks.add(item.toString()));
-    user.tvSeriesBookmarks.forEach((item) =>
-      tvSeriesBookmarks.add(item.toString())
-    );
-  });
-
-  return {
-    movieBookmarks: Array.from(movieBookmarks),
-    tvSeriesBookmarks: Array.from(tvSeriesBookmarks),
-  };
-};
 
 const fetchAndPopulate = async (url, model) => {
   try {
@@ -55,9 +36,9 @@ const fetchAndPopulate = async (url, model) => {
           ...item,
           status: details.status || "N/A",
           runtime: details.runtime || 0,
-          genre: details.genres.map((genre) => genre.name) || [],
+          genre: details.genres || [],
           tagline: details.tagline || "N/A",
-          cast: details.credits.cast.map((cast) => cast.name) || [],
+          cast: details.credits.cast || [],
           homepage: details.homepage || "N/A",
           imdb_id: details.imdb_id || "N/A",
           last_air_date: details.last_air_date || "N/A",
@@ -78,13 +59,8 @@ const fetchAndPopulate = async (url, model) => {
       })
     );
     const filteredItems = detailedItems.filter((item) => item !== null);
-    for (const item of filteredItems) {
-      await model.updateOne(
-          { id: item.id }, // Find by unique identifier
-          item, // Update with new data
-          { upsert: true } // Insert if not exists
-      );
-  }
+    
+    await model.insertMany(filteredItems);
   
     console.log(`Db populated with data to ${model.modelName}`);
   } catch (error) {
@@ -93,9 +69,8 @@ const fetchAndPopulate = async (url, model) => {
 };
 
 const refreshAll = async () => {
-  const { movieBookmarks, tvSeriesBookmarks } = await getAllBookmarkedIds();
-  await movieModel.deleteMany({ _id: { $nin: movieBookmarks } });
-  await tvSeriesModel.deleteMany({ _id: { $nin: tvSeriesBookmarks } });
+  await movieModel.deleteMany({});
+  await tvSeriesModel.deleteMany({});
   await fetchAndPopulate(movieUrl, movieModel);
   await fetchAndPopulate(tvUrl, tvSeriesModel);
   await mongoose.disconnect();

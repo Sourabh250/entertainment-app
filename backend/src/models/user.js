@@ -4,12 +4,12 @@ const userSchema = new mongoose.Schema({
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
     movieBookmarks: [{
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Movie' // Reference to the Movie model
+        type: Number,
+        required: true
     }],
     tvSeriesBookmarks: [{
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'TvSeries' // Reference to the TvSeries model
+        type: Number,
+        required: true
     }],
     searches: [{
         query: { type: String, required: true },
