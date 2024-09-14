@@ -1,6 +1,6 @@
 # Entertainment App
 
-Welcome to the Entertainment App! This app is designed to provide you with a seamless entertainment experience. Whether you're looking for movies, TV shows, or music, this app has got you covered.
+Welcome to the Entertainment App! This app is designed to provide you with a seamless entertainment experience. Whether you're looking for movies or TV shows, this app has got you covered.
 
 ## Features
 
