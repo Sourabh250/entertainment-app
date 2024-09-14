@@ -8,7 +8,7 @@ const routes = require('./routes');
 const { errorHandler } = require('./middleware/errorHandler');
 dotenv.config();
 
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 8001;
 const dbUrl = process.env.DATABASE_URL;
 
 app.use(express.json());
