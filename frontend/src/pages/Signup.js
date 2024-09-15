@@ -65,7 +65,7 @@ const Signup = () => {
             onChange={(e) => setEmail(e.target.value)}
             placeholder="Email address"
             required
-            className="block w-full px-4 py-3 border-b border-gray-400  focus:outline-none focus:ring-gray-light focus:border-gray-light sm:text-sm bg-gray-mid"
+            className="block w-full px-4 py-3 border-b border-gray-400  focus:outline-none focus:ring-gray-light focus:border-gray-light sm:text-sm bg-gray-mid rounded-none"
           />
           {/* Password input */}
           <input
@@ -76,7 +76,7 @@ const Signup = () => {
             onChange={(e) => setPassword(e.target.value)}
             placeholder="Password"
             required
-            className="mt-1 block w-full px-4 py-3 border-b border-gray-400 focus:outline-none focus:ring-gray-light focus:border-gray-light sm:text-sm bg-gray-mid"
+            className="mt-1 block w-full px-4 py-3 border-b border-gray-400 focus:outline-none focus:ring-gray-light focus:border-gray-light sm:text-sm bg-gray-mid rounded-none"
           />
           {/* Repeat password input */}
           <input
@@ -87,7 +87,7 @@ const Signup = () => {
             onChange={(e) => setRepeatPassword(e.target.value)}
             placeholder="Repeat password"
             required
-            className="mt-1 block w-full px-4 py-3 border-b border-gray-400  focus:outline-none focus:ring-gray-light focus:border-gray-light sm:text-sm bg-gray-mid"
+            className="mt-1 block w-full px-4 py-3 border-b border-gray-400  focus:outline-none focus:ring-gray-light focus:border-gray-light sm:text-sm bg-gray-mid rounded-none"
           />
           {/* Submit button */}
           <button
