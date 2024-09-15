@@ -9,6 +9,7 @@ const env = require('dotenv');
 env.config();
 
 const JWT = process.env.JWT_SECRET;
+const REFRESH_SECRET = process.env.REFRESH_SECRET;
 
 
 router.post('/signup', signupValidation, handleValidationErrors, async (req, res) => {
@@ -41,7 +42,15 @@ router.post('/login', loginValidation, handleValidationErrors, async(req, res) =
             return res.status(400).json({message: 'Invalid password'});
         }
 
-        const token = jwt.sign({ userId: user._id}, JWT, { expiresIn: '1h'});
+        const token = jwt.sign({ userId: user._id}, JWT, { expiresIn: '15m'});
+        const refreshToken = jwt.sign({ userId: user._id}, REFRESH_SECRET, { expiresIn: '7d'});
+
+        res.cookie('refreshToken', refreshToken, {
+            httpOnly: true,
+            secure: true,
+            sameSite: 'strict',
+            maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
+        });
 
         res.status(200).json({message: 'User logged in successfully', token});
     } catch (error) {
@@ -49,5 +58,30 @@ router.post('/login', loginValidation, handleValidationErrors, async(req, res) =
         res.status(500).json({message: 'Internal Server Error'});
     }
 })
+
+router.post('/logout', (req, res) => {
+    res.clearCookie('refreshToken', {
+        httpOnly: true,
+        secure: true,
+        sameSite: 'strict'
+    });
+
+    res.status(200).json({message: 'User logged out successfully'});
+});
+
+router.post("/refresh-token", async (req, res) => {
+    const refreshToken = req.cookies.refreshToken;
+    if (!refreshToken) {
+        return res.status(403).json({message: 'Access Denied: No Refresh token provided'});
+    }
+
+    try {
+        const signed = jwt.verify(refreshToken, REFRESH_SECRET);
+        const token = jwt.sign({ userId: signed.userId}, JWT, { expiresIn: '15m'});
+        res.status(200).json({message: 'Token refreshed successfully', token});
+    } catch (error) {
+        return res.status(401).json({message: 'Access Denied: Invalid Refresh token'});
+    }
+});
 
 module.exports = router;

@@ -5,20 +5,14 @@ const mongoose = require("mongoose");
 const cors = require("cors");
 const helmet = require("helmet");
 const routes = require('./routes');
+const { redirect } = require('./middleware/redirect');
 const { errorHandler } = require('./middleware/errorHandler');
 dotenv.config();
 
 const PORT = process.env.PORT || 8001;
 const dbUrl = process.env.DATABASE_URL;
 
-// Middleware to redirect HTTP to HTTPS
-app.use((req, res, next) => {
-  if (req.headers['x-forwarded-proto'] !== 'https') {
-    return res.redirect(`https://${req.headers.host}${req.url}`);
-  }
-  next();
-});
-
+app.use(redirect);
 app.use(express.json());
 app.use(cors());
 app.use(helmet());
