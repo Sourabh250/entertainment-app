@@ -137,7 +137,7 @@ const MediaCard = ({ item, isTrending }) => {
               TV Series
             </>
           )}
-          <span className="hidden sm:inline-block">
+          <span className="hidden sm:inline-block sm:ml-1">
             {" • "}
             {item.adult ? "R" : "PG"}
           </span>
