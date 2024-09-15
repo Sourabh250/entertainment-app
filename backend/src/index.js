@@ -11,6 +11,14 @@ dotenv.config();
 const PORT = process.env.PORT || 8001;
 const dbUrl = process.env.DATABASE_URL;
 
+// Middleware to redirect HTTP to HTTPS
+app.use((req, res, next) => {
+  if (req.headers['x-forwarded-proto'] !== 'https') {
+    return res.redirect(`https://${req.headers.host}${req.url}`);
+  }
+  next();
+});
+
 app.use(express.json());
 app.use(cors());
 app.use(helmet());
