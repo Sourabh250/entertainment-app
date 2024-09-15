@@ -66,7 +66,7 @@ const Login = () => {
             onChange={(e) => setEmail(e.target.value)}
             placeholder="Email address"
             required
-            className="block w-full px-4 py-3 border-b border-gray-400  shadow-sm focus:outline-none focus:ring-gray-light focus:border-gray-light sm:text-sm bg-gray-mid"
+            className="block w-full px-4 py-3 border-b border-gray-400  focus:outline-none focus:ring-gray-light focus:border-gray-light sm:text-sm bg-gray-mid"
           />
           {/* Password input */}
           <input
@@ -77,12 +77,12 @@ const Login = () => {
             onChange={(e) => setPassword(e.target.value)}
             placeholder="Password"
             required
-            className="mt-1 block w-full px-4 py-3 border-b border-gray-400  shadow-sm focus:outline-none focus:ring-gray-light focus:border-gray-light sm:text-sm bg-gray-mid"
+            className="mt-1 block w-full px-4 py-3 border-b border-gray-400  focus:outline-none focus:ring-gray-light focus:border-gray-light sm:text-sm bg-gray-mid"
           />
           {/* Submit button */}
           <button
             type="submit"
-            className="w-full mt-6 py-3 px-4 bg-red-custom text-white font-semibold rounded-lg shadow-md hover:bg-white hover:text-gray-mid focus:outline-none focus:ring-2 focus:ring-gray-light focus:ring-opacity-50"
+            className="w-full mt-6 py-3 px-4 bg-red-custom text-white rounded-lg shadow-md hover:bg-white hover:text-gray-mid focus:outline-none focus:ring-2 focus:ring-gray-light focus:ring-opacity-50"
           >
             Login to your account
           </button>
