@@ -13,10 +13,15 @@ dotenv.config();
 const PORT = process.env.PORT || 8001;
 const dbUrl = process.env.DATABASE_URL;
 
+const corsOptions = {
+  origin: '*', // Allow all origins
+  credentials: true, // Allow cookies and other credentials to be sent
+};
+
 app.use(redirect);
 app.use(express.json());
 app.use(cookieParser());
-app.use(cors());
+app.use(cors(corsOptions));
 app.use(helmet());
 app.use('/api', routes);
 
