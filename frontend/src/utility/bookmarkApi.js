@@ -7,7 +7,6 @@ export const isTokenValid = async (token) => {
       headers: {
         "x-access-token": token, // Setting the token in the request headers
       },
-      withCredentials: true,
     });
     return response.status === 200; // Token is valid if status is 200
   } catch (error) {
