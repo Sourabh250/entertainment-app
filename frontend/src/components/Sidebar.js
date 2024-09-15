@@ -5,16 +5,21 @@ import { TbDeviceTvOld } from "react-icons/tb";
 import { IoIosLogIn, IoIosLogOut } from "react-icons/io";
 import { useDispatch, useSelector } from "react-redux";
 import { logoutThunk } from "../redux/features/authSlice";
+import { logout } from "../utility/authUtils";
 import { NavLink } from "react-router-dom";
 
 const Sidebar = () => {
   const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
   const dispatch = useDispatch();
 
-
-  const handleLogout = () => {
-    localStorage.removeItem("token"); // Clearing token from local storage
-    dispatch(logoutThunk()); // Dispatching the logout thunk
+  const handleLogout = async () => {
+    try {
+      localStorage.removeItem("token"); // Clearing token from local storage
+      await logout(); // Calling the logout function
+      dispatch(logoutThunk()); // Dispatching the logout thunk
+    } catch (error) {
+      console.error("Error during logout:", error);
+    }
   };
 
   return (
@@ -23,36 +28,69 @@ const Sidebar = () => {
 
       {/* Navigation links */}
       <div className="flex lg:flex-col gap-4 lg:gap-8 lg:mt-16">
-
         {/* Home link */}
-        <NavLink to="/" className={({ isActive }) => `text-xl lg:text-2xl ${isActive ? 'text-white' : 'text-gray-light' } hover:text-red-custom` }>
+        <NavLink
+          to="/"
+          className={({ isActive }) =>
+            `text-xl lg:text-2xl ${
+              isActive ? "text-white" : "text-gray-light"
+            } hover:text-red-custom`
+          }
+        >
           <FaBorderAll />
         </NavLink>
 
         {/* Movies link */}
-        <NavLink to="/movies" className={({ isActive }) => `text-xl lg:text-2xl ${isActive ? 'text-white' : 'text-gray-light' } hover:text-red-custom` }>
+        <NavLink
+          to="/movies"
+          className={({ isActive }) =>
+            `text-xl lg:text-2xl ${
+              isActive ? "text-white" : "text-gray-light"
+            } hover:text-red-custom`
+          }
+        >
           <MdLocalMovies />
         </NavLink>
 
         {/* TV Series link */}
-        <NavLink to="/tvseries" className={({ isActive }) => `text-xl lg:text-2xl ${isActive ? 'text-white' : 'text-gray-light' } hover:text-red-custom` }>
+        <NavLink
+          to="/tvseries"
+          className={({ isActive }) =>
+            `text-xl lg:text-2xl ${
+              isActive ? "text-white" : "text-gray-light"
+            } hover:text-red-custom`
+          }
+        >
           <TbDeviceTvOld />
         </NavLink>
 
         {/* Bookmarks link */}
-        <NavLink to="/bookmarks" className={({ isActive }) => `text-xl lg:text-2xl ${isActive ? 'text-white' : 'text-gray-light' } hover:text-red-custom` }>
+        <NavLink
+          to="/bookmarks"
+          className={({ isActive }) =>
+            `text-xl lg:text-2xl ${
+              isActive ? "text-white" : "text-gray-light"
+            } hover:text-red-custom`
+          }
+        >
           <FaBookmark />
         </NavLink>
       </div>
 
       {/* Conditional rendering for login/logout */}
       {isAuthenticated ? (
-        <button onClick={handleLogout} className="flex items-center text-3xl lg:text-4xl text-red-custom hover:text-white lg:mt-auto">
+        <button
+          onClick={handleLogout}
+          className="flex items-center text-3xl lg:text-4xl text-red-custom hover:text-white lg:mt-auto"
+        >
           <IoIosLogOut className="lg:mr-1" />
           <span className="hidden lg:block text-sm font-semibold">Logout</span>
         </button>
       ) : (
-        <NavLink to="/login" className="text-3xl lg:text-4xl text-red-custom lg:mt-auto">
+        <NavLink
+          to="/login"
+          className="text-3xl lg:text-4xl text-red-custom lg:mt-auto"
+        >
           <IoIosLogIn />
         </NavLink>
       )}

@@ -3,9 +3,11 @@ import { useDispatch, useSelector } from "react-redux";
 import { logoutThunk } from "../redux/features/authSlice";
 import { fetchBookmarks } from "../redux/features/bookmarksSlice";
 import { isTokenValid } from "../utility/bookmarkApi";
+import { logout } from "../utility/authUtils";
 import Sidebar from "./Sidebar";
 import { Outlet, useLocation } from "react-router-dom";
 import Search from "./Search";
+import axios from "axios";
 
 const Layout = () => {
   const dispatch = useDispatch();
@@ -18,20 +20,43 @@ const Layout = () => {
   const isAuthenticated = useSelector((state) => state.auth.isAuthenticated); // getting authentication status from the Redux store
   const status = useSelector((state) => state.bookmarks.status); // getting bookmarks status from the Redux store
 
+  const refreshToken = async () => {
+    try {
+      const response = await axios.post(
+        `${process.env.REACT_APP_API_URL}/api/auth/refresh-token`,
+        {},
+        { withCredentials: true }
+      ); // Making a POST request to the refresh token endpoint
+      const newToken = response.data.token;
+      return newToken;
+    } catch (error) {
+      console.error("Error refreshing access token:", error);
+      throw new Error("Failed to refresh token");
+    }
+  };
+
   useEffect(() => {
     const checkToken = async () => {
       if (token) {
         try {
           const valid = await isTokenValid(token); // Waiting for the token validity check
           if (!valid) {
-            dispatch(logoutThunk()); // Logging out if the token is expired or invalid
+            const newToken = await refreshToken(); // Refreshing the token if it is invalid
+            if (newToken) {
+              localStorage.setItem("token", newToken); // Storing the new token in local storage
+            } else {
+              await logout(); // Logging out if token refresh fails
+              dispatch(logoutThunk());
+            }
           }
         } catch (error) {
-          console.error("Error while checking token validity:", error);
-          dispatch(logoutThunk()); // Handling the case where an error occurred while validating token
+          console.error("Error while checking token validity or refreshing token:", error);
+          await logout(); // Logging out if an error occurred
+          dispatch(logoutThunk()); // Handling the case where an error occurred
         }
       } else {
-        dispatch(logoutThunk()); // Logging out if no token exists
+        await logout(); // Logging out if no access token exists
+        dispatch(logoutThunk()); // Logging out if no access token exists
       }
     };
   
