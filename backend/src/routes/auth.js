@@ -44,6 +44,7 @@ router.post('/login', loginValidation, handleValidationErrors, async(req, res) =
 
         const token = jwt.sign({ userId: user._id}, JWT, { expiresIn: '15m'});
         const refreshToken = jwt.sign({ userId: user._id}, REFRESH_SECRET, { expiresIn: '7d'});
+        console.log('Setting refreshToken cookie:', refreshToken);
 
         res.cookie('refreshToken', refreshToken, {
             httpOnly: true,
@@ -76,6 +77,7 @@ router.post('/logout', (req, res) => {
 
 router.post("/refresh-token", async (req, res) => {
     const refreshToken = req.cookies.refreshToken;
+    console.log('Received refreshToken cookie:', req.cookies.refreshToken);
     if (!refreshToken) {
         return res.status(403).json({message: 'Access Denied: No Refresh token provided'});
     }
