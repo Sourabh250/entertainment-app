@@ -12,9 +12,10 @@ dotenv.config();
 
 const PORT = process.env.PORT || 8001;
 const dbUrl = process.env.DATABASE_URL;
+const corsOrigin = process.env.CORS_ORIGIN || '*';
 
 const corsOptions = {
-  origin: '*', // Allow all origins
+  origin: corsOrigin,
   credentials: true, // Allow cookies and other credentials to be sent
 };
 
