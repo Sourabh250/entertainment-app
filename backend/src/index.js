@@ -4,6 +4,7 @@ const dotenv = require("dotenv");
 const mongoose = require("mongoose");
 const cors = require("cors");
 const helmet = require("helmet");
+const cookieParser = require('cookie-parser');
 const routes = require('./routes');
 const { redirect } = require('./middleware/redirect');
 const { errorHandler } = require('./middleware/errorHandler');
@@ -14,6 +15,7 @@ const dbUrl = process.env.DATABASE_URL;
 
 app.use(redirect);
 app.use(express.json());
+app.use(cookieParser());
 app.use(cors());
 app.use(helmet());
 app.use('/api', routes);
