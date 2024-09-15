@@ -45,6 +45,7 @@ router.post('/login', loginValidation, handleValidationErrors, async(req, res) =
         const token = jwt.sign({ userId: user._id}, JWT, { expiresIn: '15m'});
         const refreshToken = jwt.sign({ userId: user._id}, REFRESH_SECRET, { expiresIn: '7d'});
         console.log('Setting refreshToken cookie:', refreshToken);
+        console.log(process.env.NODE_ENV === 'production');
 
         res.cookie('refreshToken', refreshToken, {
             httpOnly: true,
