@@ -47,7 +47,7 @@ router.post('/login', loginValidation, handleValidationErrors, async(req, res) =
 
         res.cookie('refreshToken', refreshToken, {
             httpOnly: true,
-            secure: true,
+            secure: process.env.NODE_ENV === 'production',
             sameSite: 'strict',
             maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
         });
@@ -60,13 +60,18 @@ router.post('/login', loginValidation, handleValidationErrors, async(req, res) =
 })
 
 router.post('/logout', (req, res) => {
-    res.clearCookie('refreshToken', {
-        httpOnly: true,
-        secure: true,
-        sameSite: 'strict'
-    });
-
-    res.status(200).json({message: 'User logged out successfully'});
+    try {
+        res.clearCookie('refreshToken', {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'strict'
+        });
+    
+        res.status(200).json({message: 'User logged out successfully'});
+    } catch (error) {
+        console.error('Error during logout:', error);
+        res.status(500).json({message: 'Internal Server Error'});
+    }
 });
 
 router.post("/refresh-token", async (req, res) => {
