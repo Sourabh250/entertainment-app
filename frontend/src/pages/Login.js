@@ -22,7 +22,8 @@ const Login = () => {
         {
           email,
           password,
-        }
+        },
+        { withCredentials: true }
       );
       if (response.status === 200) {
         localStorage.setItem("token", response.data.token);
