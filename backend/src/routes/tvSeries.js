@@ -1,129 +1,181 @@
 const express = require("express");
 const router = express.Router();
 const axios = require("axios");
-const TvSeries = require('../models/tvSeries');
-const { validateSearch, validateId } = require('../middleware/validation');
-const handleValidationErrors = require('../middleware/validationErrors');
-const setCacheControl = require('../middleware/cacheControl');
+const TvSeries = require("../models/tvSeries");
+const User = require("../models/user");
+const { validateSearch, validateId } = require("../middleware/validation");
+const handleValidationErrors = require("../middleware/validationErrors");
+const { verifyJWTforSearch } = require("../middleware/verifyJWT");
+const setCacheControl = require("../middleware/cacheControl");
 
 const apiKey = process.env.TMDB_API_KEY;
-const TMDB_BASE_URL = 'https://api.themoviedb.org/3';
+const TMDB_BASE_URL = "https://api.themoviedb.org/3";
 
-
-router.get('/', setCacheControl, async (req, res) => {
-    try {
-        const tvSeries = await TvSeries.find({});
-        res.status(200).json(tvSeries);
-    } catch (error) {
-        console.error('Error fetching tv series:', error);
-        res.status(500).json({ message: 'Internal Server Error', error: error.message });
-    }
+// Retrieving all TV series from the database
+router.get("/", setCacheControl, async (req, res) => {
+  try {
+    const tvSeries = await TvSeries.find({});
+    res.status(200).json(tvSeries);
+  } catch (error) {
+    console.error("Error fetching tv series:", error);
+    res
+      .status(500)
+      .json({ message: "Internal Server Error", error: error.message });
+  }
 });
 
-router.get('/popular', setCacheControl, async (req, res) => {
-    try {
-        const tvSeries = await TvSeries.find({}).sort({ popularity: -1}).limit(14);
-        res.status(200).json(tvSeries);
-    } catch (error) {
-        console.error('Error fetching popular tv series:', error);
-        res.status(500).json({ message: 'Internal Server Error', error: error.message });
-    }
+// Retrieving popular TV series, sorted by popularity and limited to 14 results
+router.get("/popular", setCacheControl, async (req, res) => {
+  try {
+    const tvSeries = await TvSeries.find({}).sort({ popularity: -1 }).limit(14);
+    res.status(200).json(tvSeries);
+  } catch (error) {
+    console.error("Error fetching popular tv series:", error);
+    res
+      .status(500)
+      .json({ message: "Internal Server Error", error: error.message });
+  }
 });
 
-router.get('/search/:query', validateSearch, handleValidationErrors, async (req, res) => {
+// Searching for TV series using a query parameter
+router.get(
+  "/search/:query",
+  validateSearch,
+  handleValidationErrors,
+  verifyJWTforSearch,
+  async (req, res) => {
     try {
-        const query = req.params.query.trim();
-        
-        const response = await axios.get(`${TMDB_BASE_URL}/search/tv`, {
-            params: {
-                api_key: apiKey,
-                query: query
-            }
-        });
+      const query = req.params.query.trim();
 
-        const tvSeries = response.data.results;
+      const response = await axios.get(`${TMDB_BASE_URL}/search/tv`, {
+        params: {
+          api_key: apiKey,
+          query: query,
+        },
+      });
 
-        if (tvSeries.length === 0) {
-            return res.status(404).json({ message: 'No tv series found', error: 'Page Not Found'});
+      const tvSeries = response.data.results;
+
+      if (tvSeries.length === 0) {
+        return res
+          .status(404)
+          .json({ message: "No tv series found", error: "Page Not Found" });
+      }
+      if (req.userId) {
+        try {
+          const user = await User.findById(req.userId);
+          const ifExits = user.searches.find(
+            (search) => search.query.toLowerCase() === query
+          );
+          if (!ifExits) {
+            await User.updateOne({
+              $push: { searches: { query: query, createdAt: new Date() } },
+            });
+          }
+        } catch (error) {
+          console.error("Error updating user search history:", error);
         }
-        res.status(200).json(tvSeries);
+      }
+      res.status(200).json(tvSeries);
     } catch (error) {
-        console.error('Error fetching tv series:', error);
-        res.status(500).json({ message: 'Internal Server Error', error: error.message });
+      console.error("Error fetching tv series:", error);
+      res
+        .status(500)
+        .json({ message: "Internal Server Error", error: error.message });
     }
-});
+  }
+);
 
-router.get('/details/:id', validateId, handleValidationErrors, async (req, res) => {
+// Retrieving detailed information about a specific TV series by ID
+router.get(
+  "/details/:id",
+  validateId,
+  handleValidationErrors,
+  async (req, res) => {
     try {
-        const tvSeriesId = req.params.id.trim();
+      const tvSeriesId = req.params.id.trim();
 
-        const response = await axios.get(`${TMDB_BASE_URL}/tv/${tvSeriesId}`, {
-            params: {
-                api_key: apiKey,
-                append_to_response: 'credits'
-            }
-        });
+      const response = await axios.get(`${TMDB_BASE_URL}/tv/${tvSeriesId}`, {
+        params: {
+          api_key: apiKey,
+          append_to_response: "credits",
+        },
+      });
 
-        if (!response.data) {
-            return res.status(404).json({ message: 'Tv Series not found' });
-        }
+      if (!response.data) {
+        return res.status(404).json({ message: "Tv Series not found" });
+      }
 
-        res.status(200).json(response.data);
+      res.status(200).json(response.data);
     } catch (error) {
-        console.error('Error fetching tv series details:', error);
-        if (error.response && error.response.status === 404) {
-            return res.status(404).json({ message: 'Tv Series not found' });
-        }
-        res.status(500).json({ message: 'Internal Server Error', error: error.message });
+      console.error("Error fetching tv series details:", error);
+      if (error.response && error.response.status === 404) {
+        return res.status(404).json({ message: "Tv Series not found" });
+      }
+      res
+        .status(500)
+        .json({ message: "Internal Server Error", error: error.message });
     }
-});
+  }
+);
 
-router.get('/url/:id', validateId, handleValidationErrors, async (req, res) => {
-    try {
-        const tvSeriesId = req.params.id.trim();
+// Retrieving the homepage URL of a specific TV series by ID
+router.get("/url/:id", validateId, handleValidationErrors, async (req, res) => {
+  try {
+    const tvSeriesId = req.params.id.trim();
 
-        const response = await axios.get(`${TMDB_BASE_URL}/tv/${tvSeriesId}`, {
-            params: {
-                api_key: apiKey,
-                append_to_response: 'credits'
-            }
-        });
+    const response = await axios.get(`${TMDB_BASE_URL}/tv/${tvSeriesId}`, {
+      params: {
+        api_key: apiKey,
+        append_to_response: "credits",
+      },
+    });
 
-        const tvSeries = response.data;
+    const tvSeries = response.data;
 
-        if (!tvSeries) {
-            return res.status(404).json({ message: 'Tv Series not found' });
-        }
-
-        res.status(200).json({ url: tvSeries.homepage });
-    } catch (error) {
-        console.error('Error fetching tv series url:', error);
-        res.status(500).json({ message: 'Internal Server Error', error: error.message });
+    if (!tvSeries) {
+      return res.status(404).json({ message: "Tv Series not found" });
     }
+
+    res.status(200).json({ url: tvSeries.homepage });
+  } catch (error) {
+    console.error("Error fetching tv series url:", error);
+    res
+      .status(500)
+      .json({ message: "Internal Server Error", error: error.message });
+  }
 });
 
-router.get('/casts/:id', validateId, handleValidationErrors, async (req, res) => {
+// Retrieving cast information for a specific TV series by ID
+router.get(
+  "/casts/:id",
+  validateId,
+  handleValidationErrors,
+  async (req, res) => {
     try {
-        const tvSeriesId = req.params.id.trim();
+      const tvSeriesId = req.params.id.trim();
 
-        const response = await axios.get(`${TMDB_BASE_URL}/tv/${tvSeriesId}`, {
-            params: {
-                api_key: apiKey,
-                append_to_response: 'credits'
-            }
-        });
+      const response = await axios.get(`${TMDB_BASE_URL}/tv/${tvSeriesId}`, {
+        params: {
+          api_key: apiKey,
+          append_to_response: "credits",
+        },
+      });
 
-        const tvSeries = response.data;
+      const tvSeries = response.data;
 
-        if (!tvSeries) {
-            return res.status(404).json({ message: 'Tv Series not found' });
-        }
+      if (!tvSeries) {
+        return res.status(404).json({ message: "Tv Series not found" });
+      }
 
-        res.status(200).json({ casts: tvSeries.credits.cast });
+      res.status(200).json({ casts: tvSeries.credits.cast });
     } catch (error) {
-        console.error('Error fetching tv series casts:', error);
-        res.status(500).json({ message: 'Internal Server Error', error: error.message });
-    }    
-});
+      console.error("Error fetching tv series casts:", error);
+      res
+        .status(500)
+        .json({ message: "Internal Server Error", error: error.message });
+    }
+  }
+);
 
 module.exports = router;

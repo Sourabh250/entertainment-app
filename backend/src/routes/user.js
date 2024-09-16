@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const User = require('../models/user');
-const verifyJWT = require('../middleware/verifyJWT');
+const { verifyJWT } = require('../middleware/verifyJWT');
 const { validateBookmark } = require('../middleware/validation');
 const handleValidationErrors = require('../middleware/validationErrors');
 const axios = require("axios");
@@ -10,10 +10,12 @@ const apiKey = process.env.TMDB_API_KEY;
 const TMDB_MOVIE_API_URL = 'https://api.themoviedb.org/3/movie';
 const TMDB_TV_API_URL = 'https://api.themoviedb.org/3/tv';
 
+// Helper function to get user by ID without password
 const getUserById = async (userId) => {
     return await User.findById(userId).select('-password');
 };
 
+// Helper function to update bookmarks for movies or TV series
 const updateBookmark = async (userId, itemId, post, isMovie) => {
 
     const user = await getUserById(userId);
@@ -40,6 +42,7 @@ const updateBookmark = async (userId, itemId, post, isMovie) => {
     await user.save();
 };
 
+// Route to get user profile information
 router.get('/profile', verifyJWT, async (req, res) => {
     try {
         const user = await User.findById(req.userId).select('-_id -password');
@@ -53,6 +56,7 @@ router.get('/profile', verifyJWT, async (req, res) => {
     }
 });
 
+// Route to add a bookmark (movie or TV series) to the user's profile
 router.post('/bookmark', verifyJWT, validateBookmark, handleValidationErrors, async (req, res) => {
     const { itemId, isMovie } = req.body;
 
@@ -65,6 +69,7 @@ router.post('/bookmark', verifyJWT, validateBookmark, handleValidationErrors, as
     }
 });
 
+// Route to remove a bookmark (movie or TV series) from the user's profile
 router.delete('/bookmark', verifyJWT, validateBookmark, handleValidationErrors, async (req,res) => {
     const { itemId, isMovie } = req.body;
     try {
@@ -76,6 +81,7 @@ router.delete('/bookmark', verifyJWT, validateBookmark, handleValidationErrors, 
     }
 });
 
+// Helper function to fetch movie details from TMDB API
 const fetchMovieDetails = async (movieId) => {
     try {
         const response = await axios.get(`${TMDB_MOVIE_API_URL}/${movieId}`, {
@@ -88,6 +94,7 @@ const fetchMovieDetails = async (movieId) => {
     }
 };
 
+// Helper function to fetch TV series details from TMDB API
 const fetchTvSeriesDetails = async (tvSeriesId) => {
     try {
         const response = await axios.get(`${TMDB_TV_API_URL}/${tvSeriesId}`, {
@@ -100,6 +107,7 @@ const fetchTvSeriesDetails = async (tvSeriesId) => {
     }
 };
 
+// Route to get all bookmarks for the user
 router.get('/bookmark', verifyJWT, async (req, res) => {
     try {
         const user = await User.findById(req.userId).select('-_id -password');

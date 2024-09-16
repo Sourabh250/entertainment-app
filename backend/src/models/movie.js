@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-
+// Defining the schema for a movie
 const movieSchema = new mongoose.Schema({
     id: { type: Number, required: true },
     original_title: { type: String, required: true },
@@ -13,15 +13,15 @@ const movieSchema = new mongoose.Schema({
     adult: { type: Boolean, required: false },
     backdrop_path: { type: String, required: true },
     poster_path: { type: String, required: true },
-    homepage: { type: String, required: true }, // homepage
-    imdb_id: { type: String, required: true }, // imdb_id
+    homepage: { type: String, required: true },
+    imdb_id: { type: String, required: true },
     genre_ids: { type: Array, required: true },
-    genre: { type: Array, required: true }, // genre name
-    tagline: { type: String, required: true }, // tagline
-    status: { type: String, required: true }, // status
-    runtime: { type: Number, required: true }, // runtime
-    cast: { type: Array, required: true }, // cast name
-    original_language: { type: String, required: true } // original_language
+    genre: { type: Array, required: true },
+    tagline: { type: String, required: true },
+    status: { type: String, required: true },
+    runtime: { type: Number, required: true },
+    cast: { type: Array, required: true },
+    original_language: { type: String, required: true }
 }, {
     timestamps: true,
     id: false

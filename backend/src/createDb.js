@@ -4,11 +4,11 @@ dotenv.config();
 const mongoose = require("mongoose");
 const movieModel = require("./models/movie");
 const tvSeriesModel = require("./models/tvSeries");
-const userModel = require("./models/user");
 
 const apiKey = process.env.TMDB_API_KEY;
 const dbUrl = process.env.DATABASE_URL;
 
+// URLs for fetching movies and TV series from TMDb
 const movieUrl = `https://api.themoviedb.org/3/discover/movie?api_key=${apiKey}`;
 const tvUrl = `https://api.themoviedb.org/3/discover/tv?api_key=${apiKey}`;
 
@@ -20,18 +20,20 @@ mongoose
   .then(() => console.log("Connected to MongoDB"))
   .catch((err) => console.error("MongoDB connection error:", err));
 
-
+// Function for fetching data from TMDb and populating the database
 const fetchAndPopulate = async (url, model) => {
   try {
     const response = await axios.get(url);
     const data = response.data.results;
     const type = model.modelName === "Movie" ? "movie" : "tv";
+    // Fetching detailed information for each item
     const detailedItems = await Promise.all(
       data.map(async (item) => {
         const detailUrl = `https://api.themoviedb.org/3/${type}/${item.id}?api_key=${apiKey}&append_to_response=credits`;
         const detailResponse = await axios.get(detailUrl);
         const details = detailResponse.data;
 
+        // Preparing item details with additional fields
         const itemDetails = {
           ...item,
           status: details.status || "N/A",
@@ -45,7 +47,7 @@ const fetchAndPopulate = async (url, model) => {
         };
 
         const isValid = Object.keys(model.schema.obj).every((field) => {
-          // If the field is required and the value is missing, mark the item as invalid
+          // If the field is required and the value is missing, marking the item as invalid
           if (model.schema.obj[field].required && !itemDetails[field]) {
             console.log(
               `Skipping item with id ${item.id} due to missing required field: ${field}`
@@ -68,6 +70,7 @@ const fetchAndPopulate = async (url, model) => {
   }
 };
 
+// Function to refresh movie and TV series data in the database
 const refreshAll = async () => {
   await movieModel.deleteMany({});
   await tvSeriesModel.deleteMany({});

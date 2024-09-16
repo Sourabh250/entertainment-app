@@ -1,5 +1,6 @@
 const { check, param } = require("express-validator");
 
+// Validation rules for user signup
 const signupValidation = [
   check("email").isEmail().withMessage("Invalid email"),
   check("password")
@@ -7,11 +8,13 @@ const signupValidation = [
     .withMessage("Password must be at least 6 characters long"),
 ];
 
+// Validation rules for user login
 const loginValidation = [
   check("email").isEmail().withMessage("Invalid email"),
   check("password").notEmpty().withMessage("Password is required"),
 ];
 
+// Validation rules for search queries
 const validateSearch = [
   param("query")
     .trim()
@@ -20,10 +23,12 @@ const validateSearch = [
     .withMessage("Search query is required"),
 ];
 
+// Validation rules for ID parameters
 const validateId = [
   param("id").trim().escape().isInt().withMessage("Invalid id"),
 ];
 
+// Validation rules for bookmark operations
 const validateBookmark = [
   check("itemId").trim().escape().isInt().withMessage("Invalid item id"),
   check("isMovie")

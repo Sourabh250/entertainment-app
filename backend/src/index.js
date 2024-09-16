@@ -14,20 +14,21 @@ const PORT = process.env.PORT || 8001;
 const dbUrl = process.env.DATABASE_URL;
 const corsOrigin = process.env.CORS_ORIGIN || '*';
 
+// CORS options to allow credentials and specific origin
 const corsOptions = {
   origin: corsOrigin,
-  credentials: true, // Allow cookies and other credentials to be sent
+  credentials: true, // Allowing cookies and other credentials to be sent
 };
 
-app.use(redirect);
-app.use(express.json());
-app.use(cookieParser());
-app.use(cors(corsOptions));
-app.use(helmet());
-app.use('/api', routes);
+app.use(redirect); // Custom middleware for handling redirects
+app.use(express.json()); // Middleware to parse JSON request bodies
+app.use(cookieParser()); // Middleware to parse cookies
+app.use(cors(corsOptions)); // Middleware to enable CORS with options
+app.use(helmet()); // Middleware to set various HTTP headers for security
+app.use('/api', routes); // Middleware to use the routes
+app.use(errorHandler); // Custom middleware for error handling
 
-app.use(errorHandler);
-
+// Function to start the server and connect to MongoDB
 const startServer = async() => {
   try {
     await mongoose.connect(dbUrl, {
