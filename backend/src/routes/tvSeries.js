@@ -68,9 +68,14 @@ router.get(
             (search) => search.query.toLowerCase() === query
           );
           if (!ifExits) {
-            await User.updateOne({
-              $push: { searches: { query: query, createdAt: new Date() } },
-            });
+            await User.updateOne(
+              { 
+                "searches.query": { $ne: query } 
+              },
+              {
+              $push: { searches: { query: query, createdAt: new Date() } }
+              },
+            );
           }
         } catch (error) {
           console.error("Error updating user search history:", error);
