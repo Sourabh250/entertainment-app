@@ -4,7 +4,12 @@ import axios from "axios";
 export const searchMovies = async (searchTerm) => {
   try {
     const response = await axios.get(
-      `${process.env.REACT_APP_API_URL}/api/movies/search/${searchTerm}`
+      `${process.env.REACT_APP_API_URL}/api/movies/search/${searchTerm}`,
+      {
+        headers: {
+          "x-access-token": localStorage.getItem("token"),
+        },
+      }
     );
     // Filtering out movies with null backdrop_path
     const movies = response.data.filter(movie => movie.backdrop_path !== null);
@@ -22,7 +27,12 @@ export const searchMovies = async (searchTerm) => {
 export const searchTVSeries = async (searchTerm) => {
   try {
     const response = await axios.get(
-      `${process.env.REACT_APP_API_URL}/api/tv-series/search/${searchTerm}`
+      `${process.env.REACT_APP_API_URL}/api/tv-series/search/${searchTerm}`,
+      {
+        headers: {
+          "x-access-token": localStorage.getItem("token"),
+        },
+      }
     );
     // Filtering out TV series with null backdrop_path
     const tvSeries = response.data.filter(tv => tv.backdrop_path !== null);
