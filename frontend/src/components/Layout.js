@@ -66,7 +66,6 @@ const Layout = () => {
 
   useEffect(() => {
     if ( isAuthenticated && token && status === 'idle') {
-      console.log('Fetching bookmarks');
       dispatch(fetchBookmarks(token)); // Fetching bookmarks if authenticated, token exists, and status is idle
     }
   }, [dispatch, token, status, isAuthenticated]);
