@@ -4,11 +4,11 @@ Welcome to the Entertainment App! This app is designed to provide you with a sea
 
 ## Features
 
-- Browse a vast library of movies, TV shows, and music
+- Browse a vast library of movies, TV shows
 - Search for your favorite entertainment content
 - Create personalized bookmarks
-- Discover new releases and trending content
-- Enjoy a smooth and intuitive user interface
+- Discover trending and recommended content
+- Enjoy a smooth user interface
 
 ## Table of Contents
 
@@ -45,7 +45,7 @@ Welcome to the Entertainment App! This app is designed to provide you with a sea
 ## Installation
 
 1. Clone this repository to your local machine.
-2. Navigate to the project directory.
+2. Navigate to the appropriate project directory.
 3. Install the necessary dependencies by running `npm install`.
 4. Start the app by running `npm start`.
 
@@ -53,9 +53,8 @@ Welcome to the Entertainment App! This app is designed to provide you with a sea
 
 1. Launch the app.
 2. Browse through the available categories or use the search feature to find specific content.
-3. Click on a movie, TV show, or song to view more details.
-4. Add items to your bookmark by clicking the "bookmark" icon.
-5. Enjoy your favorite entertainment content!
+3. Click on a movie, TV series  to view more details.
+4. Add items to your bookmark by clicking the bookmark icon.
 
 ## Setup
 
