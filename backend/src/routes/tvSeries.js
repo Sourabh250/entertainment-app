@@ -45,7 +45,7 @@ router.get(
   verifyJWTforSearch,
   async (req, res) => {
     try {
-      const query = req.params.query.trim();
+      const query = req.params.query.trim().toLowerCase();
 
       const response = await axios.get(`${TMDB_BASE_URL}/search/tv`, {
         params: {
