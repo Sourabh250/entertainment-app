@@ -27,7 +27,6 @@ export const getBookmarks = async (token) => {
         },
       }
     );
-    console.log("Fetched bookmarks:", response.data);
     return response.data;
   } catch (error) {
     console.error("Error fetching bookmarks:", error);
