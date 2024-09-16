@@ -44,6 +44,7 @@ const Layout = () => {
             const newToken = await refreshToken(); // Refreshing the token if it is invalid
             if (newToken) {
               localStorage.setItem("token", newToken); // Storing the new token in local storage
+              dispatch(fetchBookmarks(newToken)); // Fetching bookmarks with the new token
             } else {
               await logout(); // Logging out if token refresh fails
               dispatch(logoutThunk());
