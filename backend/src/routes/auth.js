@@ -55,8 +55,9 @@ router.post('/login', loginValidation, handleValidationErrors, async(req, res) =
         res.cookie('refreshToken', refreshToken, {
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production', // Using secure cookies in production
-            sameSite: 'strict',
+            sameSite: 'Strict',
             domain: process.env.DOMAIN_NAME,
+            path: '/',
             maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
         });
 
@@ -74,8 +75,10 @@ router.post('/logout', (req, res) => {
         res.clearCookie('refreshToken', {
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production',
-            sameSite: 'strict',
+            sameSite: 'Strict',
             domain: process.env.DOMAIN_NAME,
+            path: '/',
+            maxAge: 0
         });
     
         res.status(200).json({message: 'User logged out successfully'});
