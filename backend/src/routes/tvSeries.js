@@ -67,20 +67,17 @@ router.get(
         try {
           const user = await User.findById(req.userId).select('-_id -password');
           if (user) {
-            let search = await Search.findOne({ userId: req.userId });
-            if (!search) {
-              search = new Search({ userId: req.userId, searches: [{ query: query, createdAt: new Date() }] });
-              await search.save();
-            }
-
-            const ifExits = search.searches.find(
-              (s) => s.query.toLowerCase() === query
+            const result = await Search.findOneAndUpdate(
+              {
+                userId: req.userId,
+                'searches.query': { $ne: query }  // Only match if query is not already in searches
+              },
+              {
+                $addToSet: { searches: { query: query, createdAt: new Date() } }  // Add only if query does not exist
+              },
+              { new: true, upsert: true }
             );
-
-            if (!ifExits) {
-              search.searches.push({ query: query, createdAt: new Date() });
-              await search.save();
-            }
+            
           }
         } catch (error) {
           console.error("Error updating user search history:", error);
