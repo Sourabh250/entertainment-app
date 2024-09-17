@@ -113,6 +113,7 @@ You can use the provided .env.example file as a reference.
     REFRESH_SECRET = your_refresh_secret_key
     NODE_ENV = development/production
     CORS_ORIGIN = your_frontend_url
+    DOMAIN_NAME = your_frontend_domain_name
 
 4. Start the backend server:
     ```
