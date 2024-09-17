@@ -68,7 +68,7 @@ router.get(
           if (user) {
             let search = await Search.findOne({ userId: req.userId });
             if (!search) {
-              search = new Search({ userId: req.userId, searches: [{ query, createdAt: new Date() }] });
+              search = new Search({ userId: req.userId, searches: [{ query: query, createdAt: new Date() }] });
             }
 
             const ifExits = search.searches.find(
