@@ -124,7 +124,7 @@ You can use the provided .env.example file as a reference.
 
 ## API Endpoints
 
-Here are some  API endpoints. For a full list of API endpoints, check out the [Postman Documentation](https://www.postman.com/sourabhbanik234/workspace/workspace/collection/38358652-199eef21-5fc3-4561-8c88-a902fed16933?action=share&creator=38358652).
+Here are some  API endpoints. For a full list of API endpoints, check out the [Postman Documentation](https://www.postman.com/sourabhbanik234/workspace/test-workspace/collection/38358652-199eef21-5fc3-4561-8c88-a902fed16933?action=share&creator=38358652).
 
 Get all movies
 ```
@@ -167,7 +167,7 @@ Configure deployment settings according to your hosting provider's guidelines.
 
 ## Live API Documentation
 Explore the API documentation and interact with the endpoints via Postman:
-- **Production**: [Explore the API documentation](https://www.postman.com/sourabhbanik234/workspace/workspace/collection/38358652-199eef21-5fc3-4561-8c88-a902fed16933?action=share&creator=38358652)
+- **Production**: [Explore the API documentation](https://www.postman.com/sourabhbanik234/workspace/test-workspace/collection/38358652-199eef21-5fc3-4561-8c88-a902fed16933?action=share&creator=38358652)
 
 ## Contributing
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
