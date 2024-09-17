@@ -3,6 +3,7 @@ const router = express.Router();
 const axios = require("axios");
 const Movie = require("../models/movie");
 const User = require("../models/user");
+const Search = require("../models/search");
 const { validateSearch, validateId } = require("../middleware/validation");
 const handleValidationErrors = require("../middleware/validationErrors");
 const { verifyJWTforSearch } = require("../middleware/verifyJWT");
@@ -63,19 +64,21 @@ router.get(
 
       if (req.userId) {
         try {
-          const user = await User.findById(req.userId);
-          const ifExits = user.searches.find(
-            (search) => search.query.toLowerCase() === query
-          );
-          if (!ifExits) {
-            await User.updateOne(
-              { 
-                "searches.query": { $ne: query } 
-              },
-              {
-              $push: { searches: { query: query, createdAt: new Date() } }
-              },
+          const user = await User.findById(req.userId).select('-_id -password');
+          if (user) {
+            let search = await Search.findOne({ userId: req.userId });
+            if (!search) {
+              search = new Search({ userId: req.userId, searches: [] });
+            }
+
+            const ifExits = search.searches.find(
+              (s) => s.query.toLowerCase() === query
             );
+
+            if (!ifExits) {
+              search.searches.push({ query: query, createdAt: new Date() });
+              await search.save();
+            }
           }
         } catch (error) {
           console.error("Error updating user search history:", error);

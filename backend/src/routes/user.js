@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const User = require('../models/user');
+const Bookmark = require('../models/bookmark');
 const { verifyJWT } = require('../middleware/verifyJWT');
 const { validateBookmark } = require('../middleware/validation');
 const handleValidationErrors = require('../middleware/validationErrors');
@@ -10,36 +11,42 @@ const apiKey = process.env.TMDB_API_KEY;
 const TMDB_MOVIE_API_URL = 'https://api.themoviedb.org/3/movie';
 const TMDB_TV_API_URL = 'https://api.themoviedb.org/3/tv';
 
-// Helper function to get user by ID without password
-const getUserById = async (userId) => {
-    return await User.findById(userId).select('-password');
-};
 
 // Helper function to update bookmarks for movies or TV series
 const updateBookmark = async (userId, itemId, post, isMovie) => {
 
-    const user = await getUserById(userId);
+    const user = await User.findById(userId).select('-_id -password');
+    
     if(!user) {
         throw new Error('User not found');
+    }    
+
+    let bookmark = await Bookmark.findOne({ userId });
+    if(!bookmark) {
+        bookmark = new Bookmark({
+            userId,
+            movieBookmarks: [],
+            tvSeriesBookmarks: []
+        });
     }
 
-    const bookmark = isMovie ? 'movieBookmarks' : 'tvSeriesBookmarks';
-    const isBookmarked = user[bookmark].includes(itemId);
+    const bookmarkType = isMovie ? 'movieBookmarks' : 'tvSeriesBookmarks';
+    const isBookmarked = bookmark[bookmarkType].includes(itemId);
 
     if(post) {
         if(isBookmarked) {
             throw new Error('Item already bookmarked');
         } else {
-            user[bookmark].push(itemId);
+            bookmark[bookmarkType].push(itemId);
         }
     } else {
         if(isBookmarked) {
-            user[bookmark] = user[bookmark].filter(bookmark => bookmark.toString() !== itemId);
+            bookmark[bookmarkType] = bookmark[bookmarkType].filter(bookmark => bookmark.toString() !== itemId);
         } else {
             throw new Error('Item not bookmarked so cannot be removed');
         }
     }
-    await user.save();
+    await bookmark.save();
 };
 
 // Route to get user profile information
@@ -110,17 +117,24 @@ const fetchTvSeriesDetails = async (tvSeriesId) => {
 // Route to get all bookmarks for the user
 router.get('/bookmark', verifyJWT, async (req, res) => {
     try {
-        const user = await User.findById(req.userId).select('-_id -password');
+        const userId = req.userId;
+        const user = await User.findById(userId).select('-_id -password');
+
         if (!user) {
             return res.status(401).json({message: 'User not found'});
         }
 
+        const bookmark = await Bookmark.findOne({ userId });
+        if (!bookmark) {
+            return res.status(200).json({ movieBookmarks: [], tvSeriesBookmarks: [] });
+        }
+
         const movieBookmarks = await Promise.all(
-            user.movieBookmarks.map(async (id) => await fetchMovieDetails(id))
+            bookmark.movieBookmarks.map(async (id) => await fetchMovieDetails(id))
         ).then(results => results.filter(movie => movie !== null)); 
 
         const tvSeriesBookmarks = await Promise.all(
-            user.tvSeriesBookmarks.map(async (id) => await fetchTvSeriesDetails(id))
+            bookmark.tvSeriesBookmarks.map(async (id) => await fetchTvSeriesDetails(id))
         ).then(results => results.filter(series => series !== null)); 
 
         const bookmarks = {
